@@ -1,0 +1,4 @@
+otaceni potenciometru meni jas ledky
+
+ledka - GP14, GND rezistor
+potenciometr - GP26pwm, GND, 3V3OUT(36)  
