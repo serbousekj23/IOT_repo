@@ -1,0 +1,4 @@
+když se zmackne tlacitko tak se rozsviti a naopak 👍
+
+led - GP14 + GND rezistor
+tlacitko - GP16 + GND
