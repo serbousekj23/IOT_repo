@@ -1,0 +1,13 @@
+po stisku tlačítka na vysilaci se na 2 vteriny rozsviti led na prijimaci 
+
+PRIJIMAC:
+
+rezistor - GP15
+LED - rezistor + GND
+GND - GND vysilac
+GP4 - GP4 vysilac
+GP5 - GP5 vysilac
+
+VYSILAC:
+
+tlacitko - GP14 + GND
