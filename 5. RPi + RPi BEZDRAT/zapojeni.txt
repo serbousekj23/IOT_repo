@@ -1,0 +1,10 @@
+při drzeni talcitka sviti LED na prijimaci, propojeno přes WIFI 
+
+PRIJIMAC:
+
+rezistor - GP15
+LED - rezistor + GND
+
+VYSILAC:
+
+tlacitko - GP14 + GND
