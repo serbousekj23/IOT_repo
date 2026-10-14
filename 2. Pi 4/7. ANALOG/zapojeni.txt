@@ -1,0 +1,5 @@
+enkoder meni jas LED + slider v aplikaci meni jas led
+
+
+LED: GND + GP17 přes rezistor
+ENCODER: SW - GP22, CLK - GP27, DT - GP18
