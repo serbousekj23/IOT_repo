@@ -1,0 +1,4 @@
+tlačítkem se prepina stav LED, jde prepinat i tlačítkem v pc
+
+LED: GND + GP11 přes rezistor
+TLACITKO: GND + GP13
