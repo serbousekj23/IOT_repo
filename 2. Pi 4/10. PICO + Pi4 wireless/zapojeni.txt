@@ -1,0 +1,5 @@
+Tlacitko na Pi4 rozsveci LED na pico, jde ovládat i přes aplikaci, bezdrat - male pico udela wifi, velke se na ni pripoji
+
+
+TLACITKO Pi4 - GP17 + GND
+LED pico - GP15 + GND

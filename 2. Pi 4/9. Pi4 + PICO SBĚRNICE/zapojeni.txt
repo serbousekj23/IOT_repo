@@ -1,0 +1,8 @@
+Tlacitko na Pi4 rozsveci LED na pico, jde ovládat i přes aplikaci 
+
+
+GND Pi4 - GND pico
+SDA Pi4 - GP0
+SCL Pi4 - GP1
+TLACITKO Pi4 - GP17 + GND
+LED pico - GP15 + GND
