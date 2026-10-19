@@ -1,0 +1,5 @@
+v pc se napise text který se zobrazuje na displayi 
+
+
+SDA - SDA
+SCL - SCL
