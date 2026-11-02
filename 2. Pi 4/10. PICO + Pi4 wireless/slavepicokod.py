@@ -1,51 +1,51 @@
-import network
-import socket
-from machine import Pin
- 
-# Název a heslo sítě, kterou Pico vytvoří (heslo musí mít min 8 znaků)
-SSID = 'Pico_Siet'
-PASSWORD = 'tajneheslo'
- 
+from machine import I2C, Pin, mem32
+import time
+
+LED_PIN = 15
+I2C_ADDR = 0x41
+
 # Nastavení LED
-led = Pin(15, Pin.OUT)
+led = Pin(LED_PIN, Pin.OUT)
 led.value(0)
- 
-# Vytvoření vlastní Wi-Fi sítě (Access Point)
-ap = network.WLAN(network.AP_IF)
-ap.config(essid=SSID, password=PASSWORD)
-ap.active(True)
- 
-# Získání IP adresy (zpravidla to bude 192.168.4.1)
-ip = ap.ifconfig()[0]
- 
-print("====================================")
-print(f"Wi-Fi úspěšně vytvořena!")
-print(f"Název sítě: {SSID}")
-print(f"Heslo: {PASSWORD}")
-print(f"IP adresa Pica: {ip}")
-print("====================================")
- 
-# Spuštění malého serveru na portu 80
-addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
-s = socket.socket()
-s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s.bind(addr)
-s.listen(1)
- 
-print('Čekám na příkazy od velkého Raspberry...')
- 
+
+# 1. Necháme MicroPython klasicky nastavit piny pro I2C0 v Master režimu
+i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=100000)
+
+# 2. Hack: Sáhneme přímo do registrů čipu RP2040 a přepíšeme to na Slave
+I2C0_BASE = 0x40044000
+
+# Vypnutí I2C (zápis 0 do registru IC_ENABLE)
+mem32[I2C0_BASE + 0x6C] = 0
+
+# Přečtení aktuální konfigurace (registr IC_CON)
+ic_con = mem32[I2C0_BASE + 0x00]
+# Pomocí bitové masky (~0x41) vymažeme bit 0 (MASTER_MODE) a bit 6 (IC_SLAVE_DISABLE)
+ic_con &= ~0x41
+mem32[I2C0_BASE + 0x00] = ic_con
+
+# Nastavení adresy (registr IC_SAR na hodnotu 0x41)
+mem32[I2C0_BASE + 0x08] = I2C_ADDR
+
+# Opětovné zapnutí I2C (IC_ENABLE)
+mem32[I2C0_BASE + 0x6C] = 1
+
+print(f"Pico jede jako I2C Slave na adrese {hex(I2C_ADDR)}")
+
+# Smyčka pro čtení příchozích dat
 while True:
-    try:
-        cl, addr = s.accept()
-        request = cl.recv(1024).decode('utf-8')
-        if '/on' in request:
+    # Kontrola bitu 3 (RFNE - Receive FIFO Not Empty) v registru IC_STATUS
+    # Zjišťujeme, jestli velká malina něco neposlala
+    if mem32[I2C0_BASE + 0x70] & 0x08:
+        
+        # Přečteme samotný bajt dat (registr IC_DATA_CMD)
+        command = mem32[I2C0_BASE + 0x10] & 0xFF
+        print("Prijato:", command)
+        
+        # Rozsvítíme nebo zhasneme LEDku
+        if command == 1:
             led.value(1)
-            print("Zapínám LED")
-        elif '/off' in request:
+        elif command == 0:
             led.value(0)
-            print("Vypínám LED")
-        response = "HTTP/1.0 200 OK\r\n\r\nOK"
-        cl.send(response)
-        cl.close()
-    except Exception as e:
-        print("Chyba na serveru:", e)
+            
+    # Krátká pauza, ať se nepřehřeje procesor
+    time.sleep(0.01)
